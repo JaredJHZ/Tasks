@@ -75,6 +75,24 @@ UserSchema.methods.confirmKey = async function (password){
     })
 };
 
+UserSchema.statics.findByToken = async function(token){
+    let decoded;
+    try{
+        decoded = jwt.decode(token,process.env.KEY);
+    }catch(e){
+       Promise.reject();
+    }
+    let user = await this.find({email:decoded.email});
+    console.log(user);
+    return new Promise((resolve,reject)=>{
+        if(user){
+            {
+                resolve({user:this._id,email:this.email,user:this.user});
+           };
+       }else Promise.reject();
+    });
+};
+
 UserSchema.pre('save',function(next){
     if(this.isModified('password')){
         bcrypt.genSalt(10,(err,salt)=>{
